@@ -1,0 +1,103 @@
+<div class="page-container" ng-controller="inventarioController">
+
+		
+
+<md-card class="page" flex>	
+<form name="formReferencia.modProducto" ng-submit="submitUpdReferenciaForm($event)" ng-init="cargarData()" ng-cloak novalidate>
+		<md-card-content flex>		     			    
+		 	<div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" >
+			    	 <!-- REFERENCIA -->
+			    	<label>Id . Producto</label>				 
+                    <input id="id_producto" ng-model="modProducto.id_producto" name="id_producto"  maxlength="15" regex-Doc="modProducto.id_producto" ng-disabled = "modProducto.id_producto" required valid-number style="width: 250px"/>									
+					<div ng-messages="form.modProducto.id_producto.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Referencia -->
+			    	<label>Referencia</label>				 
+                    <input id="referencia" ng-model="modProducto.referencia" name="referencia"  maxlength="50" regex-Doc="modProducto.referencia" required/>									
+					<div ng-messages="form.modProducto.referencia.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" >
+			    	 <!-- PESO -->
+			    	<label>Color</label>				 
+                    <input id="color" ng-model="modProducto.color" name="color"  maxlength="15" regex-Doc="modProducto.color" required valid-number style="width: 250px"/>									
+					<div ng-messages="form.modProducto.color.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+                    </md-input-container>
+
+	    	</div>
+            <div layout-gt-sm="row">
+            
+                    <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Descripcion -->
+			    	<label>Precio</label>				 
+                    <input id="precio" ng-model="modProducto.precio" name="precio"  maxlength="100" regex-Doc="modProducto.precio" required/>									
+					<div ng-messages="form.modProducto.precio.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Descripcion -->
+			    	<label>Cantidad</label>				 
+                    <input id="cantidad" ng-model="modProducto.cantidad" name="cantidad"  maxlength="100" regex-Doc="modProducto.cantidad" required/>									
+					<div ng-messages="form.modProducto.cantidad.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Descripcion -->
+			    	<label>Recurso</label>				 
+                    <input id="recurso" ng-model="modProducto.recurso" name="recurso"  maxlength="100" regex-Doc="modProducto.recurso" required/>									
+					<div ng-messages="form.modProducto.recurso.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Descripcion -->
+			    	<label>Palabras clave</label>				 
+                    <input id="palabra_clave" ng-model="modProducto.palabra_clave" name="palabra_clave"  maxlength="100" regex-Doc="modProducto.palabra_clave" required/>									
+					<div ng-messages="form.modProducto.palabra_clave.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+
+	    	</div>
+
+		</md-card-content>    
+			<md-card-actions>
+			<div layout="row" layout-align="end center">
+				<md-button type="submit"  ng-click="submitted=true" class="btn btn-primary" ng-disabled="progressBar">
+				Actualizar</md-button>	
+				<span class="ng-messages" style="color:red" ng-show='(submitted && form.modReferencia.$invalid )'
+			    >Verificar campos en rojo</span>
+			</div>
+            <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute;bottom:1%;height:2000px;width:100%" ng-show="progressBar">
+                    <md-progress-circular md-mode="indeterminate" md-diameter="100" 
+                        style="position:fixed;bottom:50%"></md-progress-circular>
+            </div>
+                
+<!--
+            {{form.newUser.$invalid}}
+                
+-->
+
+				
+			</md-card-actions>
+		</form>
+		</md-card>
+		
+
+</div>

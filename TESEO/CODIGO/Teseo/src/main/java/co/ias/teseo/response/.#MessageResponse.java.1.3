@@ -1,0 +1,22 @@
+package co.com.bvc.emisionesenajenaciones.response;
+
+public class MessageResponse extends Response {
+
+	private static MessageResponse errorMessage;
+
+	private MessageResponse() {
+	}
+
+	public static MessageResponse getSingletonInstance() {
+		if (null == errorMessage) {
+			errorMessage = new MessageResponse();
+		}
+		return errorMessage;
+	}
+
+
+	
+	
+	
+
+}

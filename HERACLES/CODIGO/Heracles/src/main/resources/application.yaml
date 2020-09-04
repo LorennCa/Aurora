@@ -1,0 +1,26 @@
+#Configuraci�n para ambiente de desarollo
+spring:
+  profiles: dev
+  jpa:
+    database: MYSQL
+    show-sql: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  datasource:
+      url: jdbc:mysql://localhost:3306/ias_database
+      username: root
+      password: root
+      driverClassName: com.mysql.jdbc.Driver
+security:
+  basic:
+    enabled: false
+server:
+  port: 8088
+perseo:
+  protocol: http://
+  host: localhost
+  port: :10000
+  context: /perseo/v1
+  registerResource: /publishService
+---

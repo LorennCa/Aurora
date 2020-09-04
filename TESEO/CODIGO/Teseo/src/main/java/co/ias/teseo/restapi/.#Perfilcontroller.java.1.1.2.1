@@ -1,0 +1,82 @@
+package co.com.bvc.emisionesenajenaciones.restapi;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.xdi.oxauth.client.TokenResponse;
+
+//import co.com.bvc.emisionesenajenaciones.services.PerfilService;
+
+/**
+ * Controlador REST Spring encargado de atender todas las solicitudes de
+ * gestión de perfiles
+ * 
+ * @author Diego_Babativa
+ * @since 18/05/2017
+ * @version 1.0.0
+ * @param <Perfil>
+ *
+ */
+
+@RestController
+@RequestMapping("/EmisionesEnajenaciones/perfiles")
+public class Perfilcontroller<Perfil> {
+	
+	//@Autowired
+	//PerfilService perfilService;
+	
+	
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET) 
+	public ResponseEntity<List<Perfil>>get(){
+		return new ResponseEntity<List<Perfil>>(HttpStatus.OK);	
+	}
+	
+	/**
+	 * Retorna un perfil por id
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = {"/id"}, method = RequestMethod.GET)
+	public ResponseEntity<?> get(@PathVariable("id") Integer id){
+		return new ResponseEntity<Perfil>(HttpStatus.OK);
+	}
+	
+	/**
+	 * Método que atiene la creación de un nuevo usuario
+	 * @param token
+	 * @return Validation
+	 */
+	@RequestMapping(value = { "/" }, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> create(@RequestBody Perfil perfil){
+		return null;
+	}
+	
+	/**
+	 * Método que atiene la actualización de un usuario
+	 * @param token
+	 * @return Validation
+	 */
+	@RequestMapping(value = { "/{id}" }, method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> update(@RequestBody TokenResponse token){
+		return null;
+	}
+	
+	/**
+	 * Método que atiende la eliminación de un usuario.
+	 * @param id de Usuario
+	 * @return
+	 */
+	@RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
+	public ResponseEntity<?> delete(@PathVariable("id") Integer id ){
+		return new ResponseEntity<Perfil>(HttpStatus.NO_CONTENT);
+	}
+	
+
+}

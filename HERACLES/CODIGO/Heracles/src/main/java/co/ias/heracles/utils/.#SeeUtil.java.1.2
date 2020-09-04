@@ -1,0 +1,117 @@
+package co.com.bvc.emisionesenajenaciones.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.MessageSource;
+
+import co.com.bvc.emisionesenajenaciones.config.appconfig.MessageSourceConfig;
+import co.com.bvc.emisionesenajenaciones.custom.MenuTemplate;
+
+/**
+ * 
+ * @author Diego_Babativa
+ * @version 1.0
+ * @since 22/05/2017 Esta clase contiene todas aquellas funciones que se usan en
+ *        el proyecto como Utilerias, que no hacen parte del modelo de negocio.
+ * 
+ */
+public class SeeUtil {
+
+	/**
+	 * logger de applicación
+	 */
+	private static final Logger logger = LogManager.getLogger(SeeUtil.class);
+
+	/**
+	 * variable de acceso a los recursos Bundle de Mensajes de la aplciación.
+	 */
+	private static MessageSource mrc = MessageSourceConfig.messageSource();
+
+	/**
+	 * Encargado de retornar la IP de una petición, dado un Request que entra
+	 * como parámetro.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public static String getIPFromRequest(HttpServletRequest request) {
+		String IP = request.getHeader("X-Forwarded-For");
+		if (null == IP || IP.length() == 0) {
+			IP = request.getRemoteAddr();
+		}
+		logger.info(mrc.getMessage(
+				"ias.security.autenticacion.request.IP.info", null, null) + IP );
+
+		return IP;
+	}
+
+	public static MenuTemplate getMenuTemplate() {
+		MenuTemplate mt = new MenuTemplate();
+		mt.setLabel("<no_label>");
+		mt.setType("ROOT_NODE");
+
+		MenuTemplate mtChild10 = new MenuTemplate();
+		mtChild10.setLabel("Administración Perfiles");
+		mtChild10.setType("PARENT_NODE");
+
+		MenuTemplate mtChild11 = new MenuTemplate();
+		mtChild11.setLabel("Nuevo Perfil");
+		mtChild11.setType("FINAL_NODE");
+
+		MenuTemplate mtChild12 = new MenuTemplate();
+		mtChild12.setLabel("Permisos");
+		mtChild12.setType("FINAL_NODE");
+
+		MenuTemplate mtChild13 = new MenuTemplate();
+		mtChild13.setLabel("Alta de Perfil");
+		mtChild13.setType("FINAL_NODE");
+
+		List<MenuTemplate> mtChilds10 = new ArrayList<MenuTemplate>();
+		List<MenuTemplate> mtChilds0 = new ArrayList<MenuTemplate>();
+
+		// Agrega hijos a nodo.
+		mtChilds10.add(mtChild11);
+		mtChilds10.add(mtChild12);
+		mtChilds10.add(mtChild13);
+
+		mtChild10.setChilds(mtChilds10);
+
+		MenuTemplate mtChild20 = new MenuTemplate();
+		mtChild20.setLabel("Acerca de");
+		mtChild20.setType("FINAL_NODE");
+		mtChild20.setResource("Recurso");
+
+		mtChilds0.add(mtChild10);
+		mtChilds0.add(mtChild20);
+
+		// Agrega hijos de nodo raíz
+		mt.setChilds(mtChilds0);
+
+		return mt;
+	}
+
+	/**
+	 * Utilería encargada de recibir una lsita de Strings y ajustarla a una
+	 * cadena separada por comas
+	 * 
+	 * @param listoToconvert
+	 * @return
+	 */
+	public static String ListToString(List<String> listoToconvert) {
+		StringBuilder stringBuilder = new StringBuilder();
+		if (listoToconvert != null && listoToconvert.size() != 0) {
+			for (int i = 0; i < listoToconvert.size(); i++) {
+				stringBuilder.append(listoToconvert.get(i));
+				if ( i != listoToconvert.size() - 1)
+					stringBuilder.append(" ");
+			}
+			return stringBuilder.toString();
+		}
+		return "";
+	}
+}

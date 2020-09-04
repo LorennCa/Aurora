@@ -1,0 +1,640 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package co.com.bvc.emisionesenajenaciones.services.impl;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.xdi.oxauth.client.TokenClient;
+import org.xdi.oxauth.client.TokenResponse;
+import org.xdi.oxauth.model.uma.wrapper.Token;
+
+import co.com.bvc.emisionesenajenaciones.config.appconfig.GluuServerConfiguration;
+import co.com.bvc.emisionesenajenaciones.config.appconfig.MessageSourceConfig;
+import co.com.bvc.emisionesenajenaciones.custom.MenuTemplate;
+import co.com.bvc.emisionesenajenaciones.exception.EEException;
+import co.com.bvc.emisionesenajenaciones.model.AuditAuth;
+import co.com.bvc.emisionesenajenaciones.model.AuditAuthFallos;
+import co.com.bvc.emisionesenajenaciones.model.IpPermitida;
+import co.com.bvc.emisionesenajenaciones.model.Usuario;
+import co.com.bvc.emisionesenajenaciones.response.LoginResponse;
+import co.com.bvc.emisionesenajenaciones.response.MessageResponse;
+import co.com.bvc.emisionesenajenaciones.restapi.wrappers.AuthWrapper;
+import co.com.bvc.emisionesenajenaciones.restapi.wrappers.ResourceAccessWrapper;
+import co.com.bvc.emisionesenajenaciones.security.MasterSession;
+import co.com.bvc.emisionesenajenaciones.security.Session;
+import co.com.bvc.emisionesenajenaciones.services.AuditAuthFallosService;
+import co.com.bvc.emisionesenajenaciones.services.AuditAuthService;
+import co.com.bvc.emisionesenajenaciones.services.BCryptPasswordEncoderService;
+import co.com.bvc.emisionesenajenaciones.services.SecurityService;
+import co.com.bvc.emisionesenajenaciones.services.UsuarioService;
+import co.com.bvc.emisionesenajenaciones.utils.AppConstants;
+import co.com.bvc.emisionesenajenaciones.utils.SeeUtil;
+
+/**
+ * Clase que implementa los servicios de seguridad del API REST
+ * 
+ * @author Diego_Babativa
+ * @since 05/06/2017
+ * @Version 1.0
+ */
+@Component
+public class SecurityServiceImpl implements SecurityService {
+
+	/**
+	 * logger de Log4j2 Apache
+	 */
+	private static final Logger logger = LogManager
+			.getLogger(SecurityServiceImpl.class);
+
+	/**
+	 * variable de acceso a los recursos Bundle de Mensajes de la aplciación.
+	 */
+	private MessageSource mrc = MessageSourceConfig.messageSource();
+
+	/**
+	 * Servicio de AuditAuthService, que se llama cada vez que se incia y cierra
+	 * sesión en la aplicación
+	 */
+	@Autowired
+	private AuditAuthService auditAuthService;
+
+	/**
+	 * servicio AuditAuthFallos, se usa cada vez que se falla en el inicio de
+	 * sesión
+	 */
+	@Autowired
+	private AuditAuthFallosService auditAuthFallosService;
+
+	/**
+	 * Inyecta el proveedor de configuración de Gluu Server
+	 */
+	@Autowired
+	private GluuServerConfiguration gluuServerConfiguration;
+
+	@Autowired
+	private BCryptPasswordEncoderService bCpasswordEncoderService;
+
+	@Override
+	public TokenResponse getAccessToken(Usuario usuario) throws EEException {
+		try {
+			logger.info(mrc.getMessage(
+					"see.security.autenticacion.tokenclient.crear.info", null,
+					null));
+			TokenClient tokenClient = new TokenClient(gluuServerConfiguration
+					.getClient().getUrl());
+
+			logger.info("Scopes: "
+					+ SeeUtil.ListToString(gluuServerConfiguration.getClient()
+							.getScopes()) + ": \t Tokenclient: "
+					+ gluuServerConfiguration);
+			TokenResponse response = tokenClient
+					.execResourceOwnerPasswordCredentialsGrant(usuario
+							.getLogin(), usuario.getPassword(), SeeUtil
+							.ListToString(gluuServerConfiguration.getClient()
+									.getScopes()), gluuServerConfiguration
+							.getClient().getClientId(), gluuServerConfiguration
+							.getClient().getClientSecret());
+
+			return response;
+		} catch (Exception e) {
+			logger.error(mrc.getMessage(
+					"teseo.security.autenticacion.token.error", null, null), e);
+			throw new EEException(e);
+		}
+	}
+
+	@Override
+	public boolean validateTokenExpired(Session session) {
+		Date now = Calendar.getInstance().getTime();
+		Date loginSessionDate = session.getDateTimeSession();
+		long seconds = (now.getTime() - loginSessionDate.getTime()) / 1000;
+
+		if (seconds < session.getToken().getExpiresIn()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean validateTokenExists(String accessToken) {
+		if (MasterSession.sessionTokenMap.containsKey(accessToken)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean validateTokenScope(String scope, Session session) {
+		if (session.getUsuario().getPerfil().getNombre().equals(scope)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean validateIPPermitida(String ip, List<IpPermitida> ips) {
+		for (IpPermitida ipPermitida : ips) {
+			if (ipPermitida.getIp().trim().equalsIgnoreCase(ip.trim())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean validateInicioSesion(Token token, String IP) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public LoginResponse login(TokenResponse token, Usuario usuario, String IP,
+			MenuTemplate menu) {
+
+		// Agrega los datos de inicio de sesión para almacenarlos en el Map.
+		Session session = new Session();
+
+		// Agrega la fecha y hora de inicio de sessón.
+		session.setDateTimeSession((Calendar.getInstance().getTime()));
+
+		// Agrega el token obtenido del servidor de autenticación
+		session.setToken(token);
+
+		// Agrega el usuario
+		session.setUsuario(usuario);
+
+		// Agrega la Ip
+		session.setIp(IP);
+
+		// Agrega la sessión al Map de Sesiones (La clave es <<accessToken>>):
+		MasterSession.sessionTokenMap.put(token.getAccessToken(), session);
+
+		// Agrega la sessión al Map de Sesiones (La clave es <<userId>>):
+		MasterSession.sessionUserMap.put(usuario.getId(), session);
+
+		// Agrega los datos para enviar la respuesta al cliente:
+		LoginResponse loginResponse = LoginResponse.getSingletonInstance();
+		loginResponse.setMenuOpciones(menu);
+		loginResponse.setAccessToken(token.getAccessToken());
+		loginResponse.setIP(IP);
+		loginResponse.setLastLogin(usuario.getUltimoLogin());
+		loginResponse.setUserFullName(usuario.getNombres() + " "
+				+ usuario.getApellidos());
+		loginResponse.setScope(usuario.getPerfil().getNombre());
+		loginResponse.setMessage("success");
+		loginResponse.setCode(org.apache.http.HttpStatus.SC_OK);
+
+		// Audita el inicio de sesión:
+		auditLogin(session);
+
+		return loginResponse;
+	}
+
+	@Override
+	public boolean validateIPPermitida(String ip, Usuario usuario) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean validateUniqueSession(Integer usuarioId) {
+		if (MasterSession.sessionUserMap.containsKey(usuarioId)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean validateUsuarioActivo(Usuario usuario) {
+		if (usuario.getEstado().equalsIgnoreCase(
+				AppConstants.General.ESTADO_ACTIVO)) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public ResponseEntity<?> login(AuthWrapper authwrapper,
+			UsuarioService usuarioService, SecurityService securityService,
+			HttpServletRequest request) throws EEException {
+		try {
+
+			Usuario usuario = null;
+
+			usuario = usuarioService.findByLogin(authwrapper.getUser());
+
+			String IP = SeeUtil.getIPFromRequest(request);
+
+			// Valida existencia del Usuario y la contraseña corresponde
+			if (usuario != null
+					&& bCpasswordEncoderService.matches(
+							authwrapper.getPassword(), usuario.getPassword())) {
+
+				// Valida que el usuario esté activo
+				if (securityService.validateUsuarioActivo(usuario)) {
+
+					// Valida que la conexión sea desde una IP válida
+					if (securityService.validateIPPermitida(IP,
+							usuario.getListIpPermitidas())) {
+
+						TokenResponse tokenResponse = securityService
+								.getAccessToken(usuario);
+
+						// Inicia sesión sí y sólo si se genra un token de
+						// acceso
+						if (tokenResponse != null
+								&& tokenResponse.getAccessToken() != ""
+								&& tokenResponse.getAccessToken() != null) {
+
+							logger.info(mrc
+									.getMessage(
+											"see.security.autenticacion.tokenclient.crear.success",
+											null, null));
+
+							MenuTemplate menuTemplate = SeeUtil
+									.getMenuTemplate();
+
+							LoginResponse loginResponse = securityService
+									.login(tokenResponse, usuario, IP,
+											menuTemplate);
+
+							// Reiniciar el contador de intentos fallidos:
+							if (MasterSession.sessionCounterMap
+									.containsKey(authwrapper.getUser())) {
+								MasterSession.sessionCounterMap.put(
+										authwrapper.getUser(), 0);
+
+							}
+							logger.info("User: "
+									+ authwrapper.getUser()
+									+ " "
+									+ mrc.getMessage(
+											"see.security.autenticacion.usuario.login.success",
+											null, null));
+
+							return ResponseEntity.status(HttpStatus.OK).body(
+									loginResponse);
+						} else {
+							MessageResponse
+									.getSingletonInstance()
+									.setMessage(
+											mrc.getMessage(
+													"teseo.security.autenticacion.token.error",
+													null, null));
+
+							logger.info(mrc.getMessage(
+									"teseo.security.autenticacion.token.error",
+									null, null)+ " : " + tokenResponse.getErrorDescription());
+
+							MessageResponse
+									.getSingletonInstance()
+									.setCode(
+											org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE);
+						}
+					} else {
+						// Bloquea usuario por IP no permitida
+						bloquearUsuario(usuarioService, authwrapper,
+								AppConstants.General.BLOQUEO_IP_PERMITIDA);
+
+						// Actualiza el mensaje de respuesta a la vista:
+						MessageResponse
+								.getSingletonInstance()
+								.setMessage(
+										mrc.getMessage(
+												"see.security.autenticacion.usuario.bloqueado.error",
+												null, null));
+
+						logger.error(
+								"see.security.autenticacion.usuario.bloqueado.error",
+								null, null);
+
+						// Audita el fallido intento de inicio de sesión por
+						// IP no permitida
+						auditFailLogin(authwrapper, mrc.getMessage(
+								"see.security.autenticacion.usuario.IP.error",
+								null, null), IP);
+
+					}
+				} else {
+					if (usuario.getEstado().equalsIgnoreCase(
+							AppConstants.General.ESTADO_BLOQUEADO)) {
+						MessageResponse
+								.getSingletonInstance()
+								.setMessage(
+										mrc.getMessage(
+												"see.security.autenticacion.usuario.bloqueado.error",
+												null, null));
+
+						// Escribe en logs:
+						logger.error(mrc
+								.getMessage(
+										"see.security.autenticacion.usuario.bloqueado.error",
+										null, null));
+
+					} else {
+						MessageResponse
+								.getSingletonInstance()
+								.setMessage(
+										mrc.getMessage(
+												"see.security.autenticacion.usuario.inactivo.error",
+												null, null));
+
+						// Audita el fallido intento de inicio de sesión por
+						// estado de usuario distinto a activo y bloqueado
+						auditFailLogin(
+								authwrapper,
+								mrc.getMessage(
+										"see.security.autenticacion.usuario.inactivo.error",
+										null, null), IP);
+
+						// Escribe en logs:
+						logger.error(mrc
+								.getMessage(
+										"see.security.autenticacion.usuario.inactivo.error",
+										null, null));
+					}
+				}
+			} else {
+
+				if (MasterSession.sessionCounterMap.containsKey(authwrapper
+						.getUser())) {
+
+					// Si la validación es falsa, bloquea el usuario
+					if (!validateIntentosPermitidos(authwrapper.getUser())) {
+						bloquearUsuario(
+								usuarioService,
+								authwrapper,
+								AppConstants.General.BLOQUEO_INTENTOS_PERMITIDOS);
+
+					} else {
+						// Aumenta el contador de intentos
+						// permitidos x UserName para bloquear el Usuario
+						MasterSession.sessionCounterMap.put(authwrapper
+								.getUser(), MasterSession.sessionCounterMap
+								.get(authwrapper.getUser()) + 1);
+						MessageResponse
+								.getSingletonInstance()
+								.setMessage(
+										mrc.getMessage(
+												"see.security.autenticacion.usuario.login.error",
+												null, null));
+						logger.info(mrc
+								.getMessage(
+										"see.security.autenticacion.usuario.login.error",
+										null, null));
+
+						// Audita el fallido intento de inicio de sesión por
+						// usuario o contraseña no válidos
+						auditFailLogin(
+								authwrapper,
+								mrc.getMessage(
+										"see.security.autenticacion.usuario.login.error",
+										null, null), IP);
+					}
+				} else {
+					// Al fallar el login, lo ingresa x primera vez en el Map
+					// sessionCounterMap:
+					MasterSession.sessionCounterMap.put(authwrapper.getUser(),
+							1);
+					MessageResponse
+							.getSingletonInstance()
+							.setMessage(
+									mrc.getMessage(
+											"see.security.autenticacion.usuario.login.error",
+											null, null));
+					// Audita el fallido intento de inicio de sesión por
+					// usuario o contraseña no válidos
+					auditFailLogin(authwrapper, mrc.getMessage(
+							"see.security.autenticacion.usuario.login.error",
+							null, null), IP);
+
+					logger.error(mrc.getMessage(
+							"see.security.autenticacion.usuario.login.error",
+							null, null));
+				}
+			}
+			return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(
+					MessageResponse.getSingletonInstance());
+
+		} catch (Exception e) {
+			logger.error("Hubo un error al intentar iniciar sesión", e);
+			throw new EEException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> logout(LogoutWrapper logoutWrapper)
+			throws EEException {
+
+		// Valida que el accessToken se encuentre en memoria.
+		if (validateTokenExists(logoutWrapper.getAccessToken())) {
+
+			Session session = (Session) MasterSession.sessionTokenMap
+					.get(logoutWrapper.getAccessToken());
+
+			// Valida que sea una IP válida:
+			if (validateIPPermitida(logoutWrapper.getIp(), session.getUsuario()
+					.getListIpPermitidas())) {
+
+				logger.info(mrc
+						.getMessage(
+								"see.security.autenticacion.usuario.logout.validacion.success",
+								null, null));
+
+				// Valida que el Scope sea el mismo que se encuentra en
+				// memoria
+				if (validateTokenScope(logoutWrapper.getScope(), session)) {
+
+					// Remueve la sesion de Map de Tokens
+					MasterSession.sessionTokenMap.remove(logoutWrapper
+							.getAccessToken());
+					// Remueve la sessión de Map de intentos permitidos
+					MasterSession.sessionCounterMap.remove(session.getUsuario()
+							.getLogin());
+					// Remueve la sesión de Map de Usuarios
+					MasterSession.sessionUserMap.remove(session.getUsuario()
+							.getId());
+
+					logger.info(mrc
+							.getMessage(
+									"see.security.autenticacion.usuario.logout.borrar.session.success",
+									null, null));
+
+					MessageResponse
+							.getSingletonInstance()
+							.setMessage(
+									mrc.getMessage(
+											"see.security.autenticacion.usuario.logout.success",
+											null, null));
+					logger.info("User: "
+							+ session.getUsuario().getLogin()
+							+ " "
+							+ mrc.getMessage(
+									"see.security.autenticacion.usuario.logout.success",
+									null, null));
+
+					// Recupera el registro de auditoría para actualizar la
+					// fecha Logout de la sesión
+					AuditAuth auditAuth = auditAuthService.findById(session
+							.getIdAudit());
+					auditAuth.setFechaLogout(new Date());
+					auditAuthService.save(auditAuth);
+
+					return ResponseEntity.status(HttpStatus.OK).body(
+							MessageResponse.getSingletonInstance());
+				} else {
+					MessageResponse
+							.getSingletonInstance()
+							.setMessage(
+									mrc.getMessage(
+											"see.security.autenticacion.usuario.logout.scope.error",
+											null, null));
+					logger.error(mrc
+							.getMessage(
+									"see.security.autenticacion.usuario.logout.scope.error",
+									null, null));
+				}
+			} else {
+				MessageResponse
+						.getSingletonInstance()
+						.setMessage(
+								mrc.getMessage(
+										"see.security.autenticacion.usuario.logout.ip.error",
+										null, null));
+
+				logger.error(mrc.getMessage(
+						"see.security.autenticacion.usuario.logout.ip.error",
+						null, null));
+
+			}
+		} else {
+			MessageResponse
+					.getSingletonInstance()
+					.setMessage(
+							mrc.getMessage(
+									"see.security.autenticacion.usuario.logout.accessToken.error",
+									null, null));
+
+			logger.error(mrc
+					.getMessage(
+							"see.security.autenticacion.usuario.logout.accessToken.error",
+							null, null));
+		}
+		return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(
+				MessageResponse.getSingletonInstance());
+	}
+
+	@Override
+	public boolean validateIntentosPermitidos(String username) {
+		// TODO: La cantidad de intentos permitidos debe ser parametrizable
+		if (MasterSession.sessionCounterMap.get(username) >= 2) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean validateResourceAccess(String resourceURI, String scope) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void deleteToken(TokenResponse tokenResponse) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void bloquearUsuario(UsuarioService usuarioService,
+			AuthWrapper authwrapper, String motivo) {
+
+		Usuario usuarioAttemp = usuarioService.findByLogin(authwrapper
+				.getUser());
+
+		if (null != usuarioAttemp) {
+
+			usuarioAttemp.setEstado(AppConstants.General.ESTADO_BLOQUEADO);
+			usuarioService.save(usuarioAttemp);
+
+			switch (motivo) {
+
+			case AppConstants.General.BLOQUEO_INTENTOS_PERMITIDOS:
+				logger.info("Usuario: "
+						+ authwrapper.getUser()
+						+ mrc.getMessage(
+								"see.security.autenticacion.usuario.bloqueo.intentos.error",
+								null, null, null));
+				break;
+			case AppConstants.General.BLOQUEO_IP_PERMITIDA:
+				logger.info("Usuario: "
+						+ authwrapper.getUser()
+						+ mrc.getMessage(
+								"see.security.autenticacion.usuario.bloqueo.ip.motivo.error",
+								null, null));
+				break;
+			default:
+				logger.info("Usuario: "
+						+ authwrapper.getUser()
+						+ mrc.getMessage(
+								"see.security.autenticacion.usuario.login.error",
+								null, null));
+				break;
+			}
+
+		} else {
+			MessageResponse.getSingletonInstance().setMessage(
+					mrc.getMessage(
+							"see.security.autenticacion.usuario.login.error",
+							null, null));
+		}
+
+	}
+
+	@Override
+	public void auditLogin(Session session) {
+		AuditAuth auditAuth = new AuditAuth();
+		auditAuth
+				.setDescripcion(mrc.getMessage(
+						"see.security.autenticacion.usuario.login.success",
+						null, null));
+		auditAuth.setFechaLogin(new Date());
+		auditAuth.setIdUsuario(session.getUsuario().getNumeroIdentificacion());
+		auditAuth.setIpOrigen(session.getIp());
+		auditAuth.setLogin(session.getUsuario().getLogin());
+		auditAuth.setTipoOperación("DML");
+		auditAuthService.save(auditAuth);
+		// Actualiza el Id de sesión de Auditoria para actualizarlo
+		// posteriormente en Logout
+		session.setIdAudit(auditAuth.getId());
+		auditAuth = null;
+	}
+
+	@Override
+	public void auditFailLogin(AuthWrapper authWrapper, String motivo, String IP) {
+		AuditAuthFallos auditAuthFallos = new AuditAuthFallos();
+		auditAuthFallos.setDescripcion(motivo);
+		auditAuthFallos.setFechaIntento(new Date());
+		auditAuthFallos.setIdUsuario(authWrapper.getUser());
+		auditAuthFallos.setIpOrigen(IP);
+		auditAuthFallos.setLogin(authWrapper.getUser());
+		auditAuthFallosService.save(auditAuthFallos);
+		auditAuthFallos = null;
+	}
+
+}

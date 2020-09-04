@@ -1,0 +1,172 @@
+<div class="page-container" ng-controller="clientController">
+
+	    <md-toolbar class="md-hue-3"  layout="row" show-gt-md>   
+	    <div class="md-toolbar-tools" flex>  
+        	<span class="md-toolbar-tools hide-sm md-padding" hide-sm>Crear Cliente</span>
+        	<md-button class="md-icon-button" ng-click="confirmClose($event)" ng-controller="menuController">
+       		 	<md-icon md-svg-src="components/assets/svg/close.svg" aria-label="Close dialog">
+       		 	</md-icon>
+    		</md-button>
+    	</div>
+        </md-toolbar>  
+		
+
+<md-card class="page" flex>	
+<form name="form.newCliente" ng-submit="form.newCliente.$valid && submitClienteForm($event)" ng-cloak novalidate>
+		<md-card-content flex>		     			    
+		 	<div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" >
+			    	 <!-- Nombre -->
+			    	<label>Nombre</label>			 
+                    <input id="nombre" ng-model="newCliente.nombre"  name="nombre"  maxlength="100" required regex-Doc="newCliente.nombre" required style="width: 250px"/>
+					<div ng-messages="form.newCliente.nombre.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Tipo Documento -->
+			    	<label>Tipo Documento</label>				 
+					<md-select name="tipo_identificacion" id="tipo_identificacion"  ng-model="newCliente.tipo_identificacion" required>	 
+						<md-option ng-value="tipo" ng-repeat="tipo in tipoDocumentos">
+								{{tipo}}
+						</md-option>
+					</md-select>
+				</md-input-container>
+	    	</div>
+            <div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" >
+			    	 <!-- Número identificación -->
+			    	<label>Número identificación</label>				 
+                    <input id="contacto" ng-model="newCliente.num_identificacion"  name="num_identificacion"  maxlength="70" regex-Doc="newCliente.num_identificacion"  style="width: 250px"/>
+					<div ng-messages="form.newCliente.num_identificacion.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm="" >
+                    <!-- Telefono -->
+			    	<label>Teléfono</label>				 
+                    <input id="telefono" ng-model="newCliente.telefono"  name="telefono"  maxlength="10" regex-Doc="newCliente.telefono" style="width: 250px"/>
+					<div ng-messages="form.newCliente.telefono.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+	    	</div>
+            <div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Número celular -->
+			    	<label>Número celular</label>				 
+					<input id="num_celular" ng-model="newCliente.num_celular" name="num_celular"  maxlength="20"  ng-value="num_celular"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.num_celular.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Dirección -->
+			    	<label>Dirección</label>				 
+					<input id="direccion" ng-model="newCliente.direccion" name="direccion"  maxlength="100"  ng-value="direccion"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.direccion.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Correo Electronico -->
+			    	<label>Ciudad</label>				 
+					<input id="ciudad" ng-model="newCliente.ciudad"  name="ciudad"  maxlength="100"  ng-value="ciudad"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.ciudad.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+	    	</div>
+            <div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Pais -->
+			    	<label>Pais</label>				 
+					<input id="departamento" ng-model="newCliente.departamento"  name="departamento"  maxlength="100"  ng-value="departamento"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.departamento.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Correo Electronico -->
+			    	<label>E-mail</label>				 
+					<input id="email" ng-model="newCliente.email" regexmail name="email"  maxlength="100"  ng-value="email"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.email.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+	    	</div>
+            <div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Nombre contacto -->
+			    	<label>Nombre contacto</label>				 
+					<input id="nombre_contacto" ng-model="newCliente.nombre_contacto"  name="nombre_contacto"  maxlength="100"  ng-value="nombre_contacto"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.nombre_contacto.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Número contacto -->
+			    	<label>Número contacto</label>				 
+					<input id="num_contacto" ng-model="newCliente.num_contacto"  name="num_contacto"  maxlength="100"  ng-value="num_contacto"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.num_contacto.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Factor de cliente -->
+			    	<label>Factor de cliente</label>				 
+					<input id="factor_cliente" ng-model="newCliente.factor_cliente"  name="factor_cliente"  valid-number maxlength="100"  ng-value="factor_cliente"/>
+					<div class="error-wrapper">
+					<div ng-messages="form.newCliente.factor_cliente.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+					</div>	
+				</md-input-container>
+                
+	    	</div>
+		</md-card-content>    
+			<md-card-actions>
+			<div layout="row" layout-align="end center">
+				<md-button type="submit"  ng-click="submitted=true" ng-disabled="progressBar">
+					<md-tooltip>Guardar Cliente</md-tooltip>
+				    <md-icon class="material-icons" md-svg-icon="components/assets/svg/save_black.svg"></md-icon>
+				</md-button>	
+				<span class="ng-messages" style="color:red" ng-show='(submitted && form.newCliente.$invalid )'
+			    >Verificar campos en rojo</span>
+			</div>
+            <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute;bottom:1%;height:2000px;width:100%" ng-show="progressBar">
+                    <md-progress-circular md-mode="indeterminate" md-diameter="100" 
+                        style="position:fixed;bottom:50%"></md-progress-circular>
+            </div>
+	
+			</md-card-actions>
+		</form>
+		</md-card>
+		
+
+</div>

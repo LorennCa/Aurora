@@ -1,0 +1,170 @@
+package co.com.bvc.emisionesenajenaciones.restapi;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import co.com.bvc.emisionesenajenaciones.config.appconfig.AppDevConfiguration;
+import co.com.bvc.emisionesenajenaciones.config.appconfig.GluuServerConfiguration;
+import co.com.bvc.emisionesenajenaciones.exception.EEException;
+import co.com.bvc.emisionesenajenaciones.model.AuditAuthFallos;
+import co.com.bvc.emisionesenajenaciones.response.AppConfResponse;
+import co.com.bvc.emisionesenajenaciones.response.LoginResponse;
+import co.com.bvc.emisionesenajenaciones.response.MessageResponse;
+import co.com.bvc.emisionesenajenaciones.restapi.wrappers.AuthWrapper;
+import co.com.bvc.emisionesenajenaciones.restapi.wrappers.LogoutWrapper;
+import co.com.bvc.emisionesenajenaciones.services.AuditAuthFallosService;
+import co.com.bvc.emisionesenajenaciones.services.AuditAuthService;
+import co.com.bvc.emisionesenajenaciones.services.OperationsService;
+import co.com.bvc.emisionesenajenaciones.services.SecurityService;
+import co.com.bvc.emisionesenajenaciones.services.TipoModuloService;
+import co.com.bvc.emisionesenajenaciones.services.UsuarioService;
+import co.com.bvc.emisionesenajenaciones.utils.AppConstants;
+
+/**
+ * Controlador REST Spring encargado de atender todas las solicitudes de
+ * Autenticación
+ * 
+ * @author Diego_Babativa
+ * @since 17/05/2017
+ * @version 1.0.0
+ *
+ */
+
+@RestController
+@RequestMapping(AppConstants.Security.SEE_SECURITY_AUTHENTICATE_PATH)
+@Api(value = "Authentication Controller")
+public class AuthenticationController {
+
+	private static final Logger logger = LogManager
+			.getLogger(AuthenticationController.class);
+
+	@Autowired
+	UsuarioService usuarioService;
+
+	@Autowired
+	SecurityService securityService;
+
+	@Autowired
+	OperationsService operationService;
+
+	@Autowired
+	TipoModuloService tipoModuloService;
+
+
+	/**
+	 * Página de bienvenida al sistema, m�todo no-REST
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/")
+	public String welcome() {
+		// logger.in
+		return "Bienvenido al API REST de seguridad de sistema de Emisiones y Enajenaciones.";
+	}
+
+	/**
+	 * Responde en formato JSON la configuración inicial de la aplicación, tales
+	 * como activación de captcha, tiempo de duración de la sesión, entre otros.
+	 * 
+	 * @return
+	 */
+	@ApiOperation(value = AppConstants.Security.SEE_SECURITY_APP_CONF_PATH, nickname = "getApplicationConfiguration", notes = "Retorna la configuración inicial de la aplicación")
+	@ApiResponses(value = {
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_OK, message = "Success", response = AppConfResponse.class),
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Failure") })
+	@ApiParam(required = false, name = "Algún dato")
+	@RequestMapping(value = { AppConstants.Security.SEE_SECURITY_APP_CONF_PATH }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getApplicationConfiguration() {
+		logger.info("Cliente anónimo solicitando Configuración de SEE");
+		AppConfResponse appConfResponse = AppConfResponse
+				.getSingletonInstance();
+		appConfResponse.setCaptchaActivado(Boolean
+				.parseBoolean(operationService.getCaptcha()));
+		appConfResponse.setLogoPrincipal((operationService.getBannerPicture()));
+		appConfResponse.setIntentosPermitidosLogin(operationService
+				.getIntentosPermitidosLogin());
+		appConfResponse.setTiempoSessionActiva(operationService
+				.getTiempoSessionActiva());
+		
+		AppDevConfiguration x= new AppDevConfiguration();
+    	System.out.println("client id: " + x.getClientId());
+    	
+    	//System.out.println("Cliente id: " + GluuServerConfiguration.gluu().getClientId());
+    	
+		return ResponseEntity.status(HttpStatus.OK).body(appConfResponse);
+	}
+
+	/**
+	 * Atiende la validación de Usuario y contraseña para solicitud del Accesss
+	 * Token.
+	 * 
+	 * @param authwrapper
+	 * @return ResponseEntity con la siguiente información: JSON con opciones de
+	 *         Menú, accessToken, nombre de usuario, perfil e IP
+	 * 
+	 * @throws EEException
+	 */
+	@ApiOperation(value = AppConstants.Security.SEE_SECURITY_LOGIN_PATH, nickname = "login", notes = "Crea una sesión con  SEE_AdminService")
+	@ApiResponses(value = {
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_OK, message = "Ok", response = LoginResponse.class),
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_PARTIAL_CONTENT, message = "Mensaje de validación"),
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Falla servidor") })
+	@ApiImplicitParams({ @ApiImplicitParam(name = "authwrapper", value = "JSON authwrapper", required = true, dataType = MediaType.APPLICATION_JSON_VALUE) })
+	@RequestMapping(value = { AppConstants.Security.SEE_SECURITY_LOGIN_PATH }, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> login(@RequestBody AuthWrapper authwrapper,
+			HttpServletRequest request) throws EEException {
+
+		logger.info("Solicitud de Autenticación por: " + authwrapper);
+
+		return securityService.login(authwrapper, usuarioService,
+				securityService, request);
+	}
+
+	/**
+	 * Atiende el cierre de sesión de un cliente por inactividad de pantalla o
+	 * por cierre de sesión desde la opción de menú.
+	 * 
+	 * @since 12/06/2017
+	 * @param accessTokenWrapper
+	 * @return
+	 * @throws EEException
+	 */
+	@ApiOperation(value = AppConstants.Security.SEE_SECURITY_LOGIN_PATH, nickname = "logout", notes = "Se elimina una sesión de SEE_AdminService")
+	@ApiResponses(value = {
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_OK, message = "Ok", response = MessageResponse.class),
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_PARTIAL_CONTENT, message = "Mensaje de validación"),
+			@ApiResponse(code = org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR, message = "Falla servidor") })
+	@ApiImplicitParams(value = { @ApiImplicitParam(name = "logoutWrapper", value = "JSON LogoutWrapper", required = true, dataType = MediaType.APPLICATION_JSON_VALUE) })
+	@RequestMapping(value = { AppConstants.Security.SEE_SECURITY_LOGIN_PATH }, method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> logout(@RequestBody LogoutWrapper logoutWrapper)
+			throws EEException {
+		try {
+			
+			logger.info("solicitud de Logout por: " + logoutWrapper);
+			
+			return securityService.logout(logoutWrapper);
+		} catch (EEException e) {
+			throw new EEException(e);
+		}
+	}
+}

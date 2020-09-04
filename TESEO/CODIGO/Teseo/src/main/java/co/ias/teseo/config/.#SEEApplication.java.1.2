@@ -1,0 +1,65 @@
+package co.com.bvc.emisionesenajenaciones.config;
+
+//import static co.com.bvc.emisionesenajenaciones.logging.SEELogger.logError;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.multipart.MultipartResolver;
+//import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+//import co.com.bvc.emisionesenajenaciones.config.appconfig.SEEApplicationConfiguration;
+//import co.com.bvc.emisionesenajenaciones.utils.HermesMachine;
+
+/**
+ * Web SPRING application configuration file
+ * @author Hernán Quevedo
+ *
+ */
+
+/**
+ * 
+ * @author Diego_Babativa A través de anotaciones se especifica el paquete de
+ *         manejo de entidades y los Repositorios (Interfaces de acceso a datos)
+ */
+@EnableAutoConfiguration
+@EnableJpaRepositories(basePackages = { "co.com.bvc.emisionesenajenaciones.repositories" })
+@SpringBootApplication(scanBasePackages = { "co.com.bvc.emisionesenajenaciones" })
+@EntityScan(basePackages = { "co.com.bvc.emisionesenajenaciones.model" })
+@ComponentScan(basePackages = { "co.com.bvc.emisionesenajenaciones" })
+public class SEEApplication {
+	// private final FileWatchService watchService = new FileWatchService();
+
+	{
+		// @TODO mantenedores, configuraciones de una sola vez
+		// SEEApplicationConfiguration.initialize();
+
+		// int refreshtime =
+		// Integer.parseInt(SEEApplicationConfiguration.getConfiguration("filerefreshtime"));
+		try {
+			// watchService.initiate(refreshtime);
+
+			// System.out.println(app.foo());
+		} catch (Exception ex) {
+			// logError(SEEApplication.class, ex,
+			// HermesMachine.getMethodName(0));
+		}
+	}
+
+	@Bean
+	public MultipartResolver multipartResolver() {
+		// CommonsMultipartResolver multipartResolver = new
+		// CommonsMultipartResolver();
+		// multipartResolver.setMaxUploadSize(500000000);
+		return null;
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(SEEApplication.class, args);
+	}
+}

@@ -1,0 +1,23 @@
+#Configuraci�n para ambiente de desarollo
+spring:
+  profiles: dev
+  jpa:
+    database: MYSQL
+    show-sql: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  datasource:
+      url: jdbc:mysql://localhost:3306/ias_database
+      username: root
+      password: root
+      driverClassName: com.mysql.jdbc.Driver
+security:
+  basic:
+    enabled: false
+server:
+  port: 9191
+token:
+  expiretime: 1800
+  serviceurl: http://localhost:9191/teseoAuth/v1/
+---

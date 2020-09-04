@@ -1,0 +1,47 @@
+package co.com.bvc.emisionesenajenaciones.utils;
+
+/**
+ * Clase que contiene los valores constantes de la aplicación
+ * 
+ * @author Diego_Babativa
+ * @version 1.0
+ * @since 23/05/2017
+ *
+ */
+public class AppConstants {
+
+	// Constante de versión de la API
+	public static final String REST_API_VERSION_1 = "/v1";
+	public static final String SEE_REST_API_PATH = "/EmisionesEnajenaciones";
+
+	// ****************************************************************************
+	// Constantes de las URL de acceso a los recursos de autenticación:
+	public static class Security {
+		public static final String SEE_SECURITY_AUTHENTICATE_PATH = SEE_REST_API_PATH
+				+ REST_API_VERSION_1 + "/authenticate";
+		public static final String SEE_SECURITY_AUTHORIZE_PATH = SEE_REST_API_PATH
+				+ REST_API_VERSION_1 + "/authorize";
+		public static final String SEE_SECURITY_LOGIN_PATH = "/login";
+		public static final String SEE_SECURITY_APP_CONF_PATH = "/appConf";
+	}
+
+	// ****************************************************************************
+	// constantes de las URL de acceso a los recursos de Usuarios
+	public static class Usuarios {
+		public static final String SEE_USUARIOS = "/usuarios";
+		public static final String SEE_USUARIO = "/usuarios/";
+	}
+
+	// ****************************************************************************
+	// Constantes generales de la aplicación
+	public static class General {
+		public static final String ESTADO_ACTIVO = "A";
+		public static final String ESTADO_BLOQUEADO = "B";
+		public static final String ESTADO_INACTIVO = "I";
+		public static final String BLOQUEO_IP_PERMITIDA = "BLOQUEO_IP";
+		public static final String BLOQUEO_INTENTOS_PERMITIDOS = "BLOQUEO_INTENTOS";
+		public static final Integer ID_DICCIONARIO_CLAVES = 1;
+		public static final Integer STRENGTH_PASSWORD_ENCODER = 11;
+	}
+
+}

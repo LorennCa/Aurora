@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportePerfil" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e1c752d2-4200-4771-a446-235125b721d6">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1" uuid="25647e80-1a61-4989-9af9-4b75d563b5ec">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="id" class="java.lang.Integer">
+			<fieldDescription><![CDATA[id]]></fieldDescription>
+		</field>
+		<field name="label" class="java.lang.String">
+			<fieldDescription><![CDATA[label]]></fieldDescription>
+		</field>
+		<field name="children" class="java.util.List">
+			<fieldDescription><![CDATA[children]]></fieldDescription>
+		</field>
+		<field name="isSelected" class="java.lang.Boolean">
+			<fieldDescription><![CDATA[isSelected]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="dataset2" uuid="34936388-6816-475a-ad1b-5220cf5aeacb">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="id" class="java.lang.Integer">
+			<fieldDescription><![CDATA[id]]></fieldDescription>
+		</field>
+		<field name="label" class="java.lang.String">
+			<fieldDescription><![CDATA[label]]></fieldDescription>
+		</field>
+		<field name="children" class="java.util.List">
+			<fieldDescription><![CDATA[children]]></fieldDescription>
+		</field>
+		<field name="isSelected" class="java.lang.Boolean">
+			<fieldDescription><![CDATA[isSelected]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="id" class="java.lang.Integer"/>
+	<parameter name="nombre" class="java.lang.String"/>
+	<parameter name="format" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[id]]></fieldDescription>
+	</field>
+	<field name="label" class="java.lang.String">
+		<fieldDescription><![CDATA[label]]></fieldDescription>
+	</field>
+	<field name="children" class="java.util.List">
+		<fieldDescription><![CDATA[children]]></fieldDescription>
+	</field>
+	<field name="isSelected" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[isSelected]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="142" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="137" backcolor="#006699" uuid="80208205-00b0-43dd-a3d6-755deb182cfa"/>
+				<textField>
+					<reportElement x="148" y="19" width="380" height="20" forecolor="#FFFFFF" uuid="d074f056-c4c0-4f2e-8ff2-859e1c77ce4a"/>
+					<textElement>
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{nombre}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="55" y="87" width="420" height="20" forecolor="#FFFFFF" uuid="7d309e64-457b-4144-bbea-c9c170a44feb"/>
+					<textFieldExpression><![CDATA[$P{nombre}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement x="15" y="19" width="132" height="20" forecolor="#FFFFFF" uuid="2a9edbc3-1031-480b-a416-1f1fe57584ea"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1. Reporte del Perfil ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="50" width="192" height="20" forecolor="#FFFFFF" uuid="8635b32b-46da-485e-9ed2-556e89a31b05"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1.1. Información del perfil]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="87" width="39" height="20" forecolor="#FFFFFF" uuid="4f5216ef-27f4-4e32-afda-b14e747f7eb4"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Nombre:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="117" width="223" height="20" forecolor="#FFFFFF" uuid="6ba1df1e-c2de-42db-babd-84fcbea8568c"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1.2. Módulos y funciones asignasdas]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="114" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="15" y="21" width="148" height="17" uuid="ab9552b7-1949-489b-8f55-d7f366695bbb"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement x="15" y="47" width="523" height="61" uuid="ef04bda3-79b3-4a0e-9fb7-dcf15350f0fe"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="dataset1" uuid="13dc495e-2d3f-4d03-b740-1539094f3177">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{children})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="61" width="523">
+						<textField>
+							<reportElement x="18" y="10" width="100" height="17" uuid="971f8aae-b609-47fa-8b98-f2912981a1c3"/>
+							<textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+						</textField>
+						<componentElement>
+							<reportElement x="18" y="33" width="494" height="22" uuid="789c3f21-cb32-4358-a2e3-f2648f805dc8"/>
+							<jr:list printOrder="Vertical">
+								<datasetRun subDataset="dataset2" uuid="a5347242-89d8-4957-a10c-00878fd63d20">
+									<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{children})]]></dataSourceExpression>
+								</datasetRun>
+								<jr:listContents height="22" width="494">
+									<textField>
+										<reportElement x="15" y="5" width="100" height="15" uuid="8ceca001-c201-4f9a-a285-c82206493adc"/>
+										<textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+									</textField>
+									<textField>
+										<reportElement x="170" y="5" width="100" height="15" uuid="b888dba6-14d1-40f8-8c07-eae29d0b7574"/>
+										<textFieldExpression><![CDATA[$F{isSelected}==true?"HABILITADO":"DESHABILITADO"]]></textFieldExpression>
+									</textField>
+								</jr:listContents>
+							</jr:list>
+						</componentElement>
+						<textField>
+							<reportElement x="169" y="10" width="100" height="20" uuid="8473f15c-6e97-4c7b-a9f3-4279e9e31129"/>
+							<textFieldExpression><![CDATA[$F{isSelected}==true?"HABILITADO":"DESHABILITADO"]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<textField>
+				<reportElement x="174" y="22" width="100" height="17" uuid="7ed5dbbd-495c-428c-ba57-2a0c4b454978"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{isSelected}==true?"HABILITADO":"DESHABILITADO"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="455" y="22" width="100" height="20" uuid="479f85bb-738b-4871-9289-24837eeac0ec"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="10" y="22" width="186" height="20" uuid="2e91a1a4-ef8d-4fa9-94fa-506e52f60a44"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{format}.toString()).equals("PDF")?new java.util.Date():""]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

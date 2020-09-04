@@ -1,0 +1,86 @@
+#Configuraci�n para ambiente de desarollo
+spring:
+  profiles: dev
+  jpa:
+    database: MYSQL
+    show-sql: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  datasource:
+      url: jdbc:mysql://localhost:3306/ias_database
+      username: root
+      password: root
+      driverClassName: com.mysql.jdbc.Driver
+  http:
+   multipart:
+    max-file-size: 10MB
+    max-request-size: 10MB
+security:
+  basic:
+    enabled: false
+server:
+  port: 10001
+  see_protocol: http://
+  see_host: localhost
+  see_web_context: see3/
+authservice:
+ gettokenserviceurl: http://localhost:9191/teseoAuth/v1/gettoken/
+ refreshtokenserviceurl: http://localhost:9191/teseoAuth/v1/refreshtoken/admin/
+ eraseusererviceurl: http://localhost:9191/teseoAuth/v1/eraseuser/
+ newuserserviceurl: http://localhost:9191/teseoAuth/v1/newuser/
+tokenservice:
+ clientid: 1
+ inum: "@!A8AE.136B.DF5C.167F!0001!31DF.3B9F!0008!F1D9.8116.7F2D.C78"
+mailserver:
+  mail_smtp_auth : true
+  mail_smtp_starttls_enable : true
+  mail_smtp_host : smtp.gmail.com
+  mail_smtp_port : 587
+  mail_pass: 4m4r1ll0**
+  mail_from: lorenaa.cardonaa@gmail.com
+  mail_default_password: oiJ6V7ui+YmEjZaVtgWC6w==
+prservice:
+  protocol: http://
+  host: localhost
+  port: :7001
+  context: /passwordResetService
+  getPasswordResetResource: /getPasswordReset
+  resetPasswordResource: /resetPassword
+  deletePasswordResource: /deletePasswordReset
+heraclesservice:
+  protocol: http://
+  host: localhost
+  port: :8088
+  context: /heraclesConfigService
+  appConfResource: /appConf
+  seeConfResource: /getIASConfig
+perseo:
+  protocol: http://
+  host: localhost
+  port: :10000
+  context: /perseo/v1
+  registerResource: /publishService
+pdservice:
+  protocol: http://
+  host: localhost
+  port: :7002
+  context: /passwordDictionary/usuarios
+  diccionarioresource: /diccionario
+ 
+backend:
+  server: http://localhost
+  port: 10001
+  fileserviceport: 8888
+services:
+  services:
+  -
+    name: perseo
+    protocol: http://
+    host: localhost
+    port: 10000
+    serviceContext: /perseo/v1/services
+jsa:
+  rabbit:
+    queue: iassr.queue
+---

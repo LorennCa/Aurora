@@ -1,0 +1,59 @@
+<div ng-controller="loginController">
+    <div class="container">
+        <div class="card card-container" ng-cloak>
+            <img src="{{paramBanner}}" width="100%">
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin" name="loginForm">
+                <div layout="row" layout-align="center center">
+                    <md-input-container>
+                        <label>Usuario</label>
+                         <md-icon class="material-icons" md-svg-icon="components/assets/svg/account_circle.svg"></md-icon>
+                        <!-- <md-icon>account_circle</md-icon> -->
+                        <input caracteres-valida required ng-model="loginUsuario" name="loginUsuario"  onpaste="return false" maxlength="20">
+                        <div ng-messages="loginForm.loginUsuario.$error">
+                            <div ng-message="required">Requerido</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="center center">
+                    <md-input-container>
+                        <label>Contraseña</label>
+                         <md-icon class="material-icons" md-svg-icon="components/assets/svg/lock.svg"></md-icon>
+                       <!--  <md-icon>lock</md-icon> -->
+                        <input required type="password" ng-model="loginClave" name="loginClave" ng-keydown="verificarEnter($event)" onpaste="return false" maxlength="20">
+                        <div ng-messages="loginForm.loginClave.$error">
+                            <div ng-message="required">Requerido</div>
+                        </div>                                        
+                    </md-input-container>
+                </div>
+				
+                <!--mensaje error de autenticación-->
+                <div layout="row" layout-align="center center" ng-show="mostrarMsjLogin" ng-init="mostrarMsjLogin = false"> 
+                    <span class="requerido" ng-style="myStyle={color:'red'}">{{mensajeLogin}}</span>
+                </div>
+
+                <!-- Captcha -->
+                <div layout="row" class="g-recaptcha" 
+                    tabindex="3" key="keyCapctcha" 
+                    data-sitekey="keyCapctcha"
+                    layout-align="center center" vc-recaptcha theme="light" 
+                    ng-show="paramCaptcha">
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <md-button class="md-raised md-accent" ng-click="validarLogin()" name="action" ng-disabled="progressBar">
+                    <!-- ui-sref="menu"> -->
+                        Seguir 							
+                    </md-button>
+                </div>
+                <div layout="row" layout-align="center center" >
+                    <a ng-href="#" onclick="resetPasswordFunc(loginForm.loginUsuario.value)">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+        </div><!-- /card-container -->
+    </div><!-- /container -->
+    <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute;bottom:1%;height:2000px;width:100%" ng-show="progressBar">
+            <md-progress-circular md-mode="indeterminate" md-diameter="100" 
+                        style="position:fixed;bottom:50%"></md-progress-circular>
+    </div>
+</div>
