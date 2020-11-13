@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import co.ias.aurora.perseo.ServiceDTO;
-import co.ias.aurora.utils.AppConstants;
+import co.aurora.perseo.ServiceDTO;
+import co.aurora.utils.AppConstants;
 
 /*import java.io.File;
 import java.io.FileInputStream;
