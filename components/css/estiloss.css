@@ -1,0 +1,23 @@
+table thead {
+  color: #2D87D3;
+  background-color: #2D87D3;
+}
+.containertres{
+	width:auto;
+	max-width:auto;
+	height:auto;
+	display:flex;
+	flex-wrap:wrap;
+	justify-content:center;
+	margin:auto;
+	}
+.containertres .card{
+	width:auto;
+	height:350px;
+	border-radius:8px;
+	box-shadow:0 2px 2px rgba(0, 0, 0, 0.2);
+	overflow:hidden;
+	margin:20px;
+	text-align:center;
+	transition:all 0.25s;
+	}

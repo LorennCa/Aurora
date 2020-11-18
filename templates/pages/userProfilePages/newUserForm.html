@@ -1,0 +1,259 @@
+<div class="page-container" ng-controller="usersController">
+
+	    <md-toolbar class="md-hue-3"  layout="row" show-gt-md>   
+	    <div class="md-toolbar-tools" flex>  
+        	<span class="md-toolbar-tools hide-sm md-padding" hide-sm>Usuario Nuevo</span>
+        	<md-button class="md-icon-button" ng-click="confirmClose($event)" ng-controller="menuController">
+       		 	<md-icon md-svg-src="components/assets/svg/close.svg" aria-label="Close dialog">
+       		 	</md-icon>
+    		</md-button>
+    	</div>
+        </md-toolbar>  
+		
+
+<md-card class="page" flex>	
+<form name="form.newUser" ng-submit="form.newUser.$valid && !invalidConfirm &&  !invalidConsPass && !invalidMayuPass && !invalidCharPass && !invalidNumbPass && !restrictiveWord &&  !exits && !spaceField && submitUserForm($event)" ng-cloak novalidate>
+		<md-card-content flex>		     			    
+		 	<div layout-gt-sm="row">			
+			    <md-input-container class="md-block" flex-gt-sm="" >
+			    	 <!-- tipo Documento -->
+			    	<label>Tipo Documento</label>				 
+					<md-select name="tipodoc" id="tipodoc"  ng-model="newUser.tipo" required>	 
+						<md-option ng-value="tipo.id" ng-repeat="tipo in tipoDocumentos">
+								{{tipo.nombre}}
+						</md-option>
+					</md-select> 
+					<div ng-messages="form.newUser.tipodoc.$error" >
+							<div ng-message="required">{{requerido}}</div>						
+					</div>
+				</md-input-container>
+				<!-- Numero de documento -->
+				<md-input-container class="md-block" flex-gt-sm="" layout-padding>
+			    	<label>Número Documento</label>				 
+					<input id="numDoc" ng-model="newUser.numeroDoc"  name="numDoc"  maxlength="15" regex-Doc="newUser.tipo" reg-ex-input reg-ex="^[a-zA-Z0-9\u0008\u000A]+$" required/>									
+					<div ng-messages="form.newUser.numDoc.$error" >
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexDoc">{{invalidCh}}</div>
+					</div>
+				</md-input-container>
+				<!-- Digito de verficación Nit-->	
+				<md-input-container class="md-block"  style="width:20%" flex-sm layout-padding ng-show="dvR = (newUser.tipo == 2)">	
+                <label>Dv</label>
+				<input id="dv" ng-model="newUser.dv"  name="dv"  maxlength="1" reg-ex-input reg-ex="^[0-9\u0008\u000A]+$" dv-Validate="[newUser.tipo,newUser.numeroDoc]"  aria-label="dv Documento" style="width:15px" ng-required="dvR"/>
+				<div class="error-wrapper"  ng-if="form.newUser.dv.$invalid" >
+					<div ng-messages="form.newUser.dv.$error">
+						<div ng-message="required">{{requerido}}</div>						
+						<div ng-message="dvValidate">{{invDvMsg}}</div>
+					</div>
+	
+				</div>										
+				</md-input-container>		
+	    	</div>
+				
+			<div layout-gt-sm="row"  >    	
+			     <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    	<!-- Nombres -->
+			    	<label>Nombres</label>				 
+					<input id="nombre" ng-model="newUser.nombre"  ng-pattern="validaAlfaNumericoEsp" name="nombre"  maxlength="50"  ng-value="nombre" required/>	
+					<div ng-messages="form.newUser.nombre.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>								
+			    </md-input-container>
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Apellidos -->
+			    	<label>Apellidos</label>				 
+					<input id="apellidos" ng-model="newUser.apellidos"  ng-pattern="validaAlfaNumericoEsp" name="apellidos"  maxlength="50"  ng-value="apellidos" required/>
+					<div ng-messages="form.newUser.apellidos.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>	
+			    </md-input-container> 
+			</div>
+<div layout-gt-sm="row"  >    	
+			     <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    	<!-- Telefono -->
+			    	<label>Telefóno</label>				 
+					<input id="telefono" ng-model="newUser.telefono" name="telefono"  maxlength="50"  ng-value="telefono"/>	
+					<div ng-messages="form.newUser.telefono.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>								
+			    </md-input-container>
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Dirección -->
+			    	<label>Dirección</label>				 
+					<input id="direccion" ng-model="newUser.direccion" name="direccion"  maxlength="50"  ng-value="direccion"/>
+					<div ng-messages="form.newUser.direccion.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>	
+			    </md-input-container> 
+			</div>
+
+			<div layout-gt-sm="row"  >	    	
+
+				<md-input-container class="md-block" flex-gt-sm="" > 
+				<!-- Super Administrador -->
+			    	<label>Super Administrador</label>				 
+					<md-select name="superAdmin" id="superAdmin"  ng-model="newUser.superAdmin"  ng-disabled="habSAdmin" ng-init="validaUserEntity()" ng-change="habOptions(4)" ng-required="requiredSAdmin" >			 
+						<md-option value="undefined">Seleccione</md-option>
+						<md-option ng-value="superAdmin" ng-repeat="superAdmin in superAdmins" >
+								{{superAdmin.nombre}}
+						</md-option>
+					</md-select> 
+					<div ng-messages="form.newUser.superAdmin.$error" >
+							<div ng-message="required">{{requerido}}</div>						
+					</div>
+				</md-input-container>
+			</div>
+			
+			<div layout-gt-sm="row"  >	    	
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Correo Electronico -->
+			    	<label>Correo Electrónico</label>				 
+					<input id="email" ng-model="newUser.email" regexmail name="email"  maxlength="100"  ng-value="email" required/>
+					<div class="error-wrapper"  ng-if="form.newUser.email.$invalid || invalidEmail">
+					<div ng-messages="form.newUser.email.$error">
+						<div ng-message="required">{{requerido}}</div>
+						<div ng-message="regexmail">{{invEmail}}</div>
+					</div>
+					<!-- <div ng-messages="form.newUser.email.$invalid">	
+						<div ng-messages="invalidEmail" ng-show="invalidEmail" ng-hide="form.newUser.email.$error.required">{{invEmail}}</div>
+					</div> -->
+					</div>	
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm="" layout-padding>
+				<!-- Login -->
+			    	<label>Login</label>				 
+					<input id="login" ng-model="newUser.login" ng-change="setExits()" name="login"  maxlength="20"   ng-value="login" ng-blur="validarLogin(newUser.login)"   required /><!-- ng-blur="validarLogin(newUser.login)" -->
+					<div class="error-wrapper" ng-if=" form.newUser.login.$invalid || exits || spaceField">
+					<div ng-messages="form.newUser.login.$error" >
+							<div ng-message="required">{{requerido}}</div>
+					</div>	
+					<div ng-messages="form.newUser.login.$invalid" ng-hide="form.newUser.login.$error.required" >
+						<span class="ng-messages" ng-show="exits" >{{exitsPro}}</span>
+						<span class="ng-messages" ng-show="spaceField" >{{invSpaceField}}</span>
+					</div>
+					</div>
+				</md-input-container>				
+			</div>   
+
+			<div layout-gt-sm="row" >	    	
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Contraseña -->
+			    	<label>Contraseña</label>				 
+					<input type="password" id="password" ng-model="newUser.password"  name="password"  ng-value="password" ng-blur="validaPassNew(newUser.password)"  maxlength="15" required/>		
+					<div class="error-wrapper"  ng-if="form.newUser.password.$invalid || invalidlengPass || invalidConsPass || invalidMayuPass || invalidCharPass || invalidNumbPass || restrictiveWord">			
+					<div ng-messages="form.newUser.password.$error" >
+						<div ng-message="required">{{requerido}}</div>
+					</div>
+					<div ng-messages="form.newUser.password.$invalid" ng-hide="form.newUser.password.$error.required">
+						<div ng-messages="invalidlengPass" ng-show="invalidlengPass">{{invalidLenght}}</div>			
+						<div ng-messages="invalEqConsPass" ng-show="invalEqConsPass">{{passEqConseMsg}}</div>
+						<div ng-messages="invalidConsPass" ng-show="invalidConsPass">{{passConseMsg}}</div>
+						<div ng-messages="invalidMayuPass" ng-show="invalidMayuPass">{{passMayusMsg}}</div>
+						<div ng-messages="invalidCharPass" ng-show="invalidCharPass">{{passCharaMsg}}</div>
+						<div ng-messages="invalidNumbPass" ng-show="invalidNumbPass">{{passNumbMsg}}</div>
+						<div ng-messages="restrictiveWord" ng-show="restrictiveWord">{{invWordMsg}}</div>
+					</div>		
+					</div>	
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm="" layout-padding>
+				<!-- Confirmar Contraseña -->
+			    	<label>Confirmar Contraseña</label>				 
+					<input type="password" id="ConfirmPass" ng-model="newUser.ConfirmPass" name="ConfirmPass"  maxlength="50"  ng-value="ConfirmPass" ng-blur="passConfirm(newUser.password, newUser.ConfirmPass,'N')" required/>
+					<div class="error-wrapper"  ng-if="form.newUser.ConfirmPass.$invalid || invalidConfirm">
+
+					<div ng-messages="form.newUser.ConfirmPass.$error"  >
+						<div ng-message="required">{{requerido}}</div>					
+					</div>
+					<div ng-messages="form.newUser.ConfirmPass.$invalid"> 	
+						<div ng-messages="invalidConfirm" ng-show="invalidConfirm" ng-hide="form.newUser.ConfirmPass.$error.required">{{confirmPass}}</div>
+					</div>
+					</div>	
+				</md-input-container>				
+			</div>   
+
+			<div layout-gt-sm="row">
+			    <md-input-container class="md-block" flex-gt-sm="" > 
+			    <!-- Perfiles -->
+			    	<label>Perfiles</label>				 
+					<md-select name="perfil" id="perfil"  ng-model="newUser.perfil" required>		 
+						<md-option ng-value="perfil" ng-repeat="perfil in perfiles" >
+						{{perfil.nombre}}
+						</md-option>
+					</md-select> 
+					<div ng-messages="form.newUser.perfil.$error" >
+							<div ng-message="required">{{requerido}}</div>						
+					</div>
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm="" > 
+				<!-- Estado -->
+			    	<label>Estado</label>				 
+					<md-select name="estado" id="estado"  ng-model="newUser.estado" required>		 
+						<md-option ng-value="estado" ng-repeat="estado in estadosCrear">
+								{{estado}}
+						</md-option>
+					</md-select> 
+					<div ng-messages="form.newUser.estado.$error" >
+							<div ng-message="required">{{requerido}}</div>						
+					</div>
+				</md-input-container>			
+			</div> 	
+
+			<div layout-gt-sm="row"  >	    	
+			    
+			    <md-input-container class="md-block" flex-gt-sm="" layout-padding> 
+			    <!-- Direcciones Ip Autorizadas  Ip1-->
+			    	<label >Direcciones Ip Autorizadas</label>				 
+					<input id="ip" ng-model="newUser.ip1" ng-pattern="validIp" name="ip1"  maxlength="50"  ng-value="ip1" required valid-number style="width: 250px"/>
+					<div ng-messages="form.newUser.ip1.$error"  >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{InvalidStructur}}</div>
+					</div>	
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm="" layout-padding>
+				<!-- Ip2 -->			    			 
+					<input id="ip2" ng-model="newUser.ip2"  ng-pattern="validIp" name="ip2"  maxlength="50"  ng-value="ip2"  aria-label="ip2" valid-number style="width: 250px"/>
+					<div ng-messages="form.newUser.ip2.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{InvalidStructur}}</div>
+					</div>	
+				</md-input-container>	
+				<md-input-container class="md-block" flex-gt-sm="" layout-padding>
+				<!-- Ip3 -->			    			 
+					<input id="ip3" ng-model="newUser.ip3"  ng-pattern="validIp" name="ip3"  maxlength="50"  ng-value="ip3" aria-label="ip3" valid-number style="width: 250px"/>
+					<div ng-messages="form.newUser.ip3.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>	
+				</md-input-container>
+                </div>
+		</md-card-content>    
+			<md-card-actions>
+			<div layout="row" layout-align="end center">
+				<md-button type="submit"  ng-click="submitted=true" ng-disabled="progressBar">
+					<md-tooltip>Guardar Usuario</md-tooltip>
+				    <md-icon class="material-icons" md-svg-icon="components/assets/svg/save_black.svg"></md-icon>
+				</md-button>	
+				<span class="ng-messages" style="color:red" ng-show='(submitted && form.newUser.$invalid )'
+			    >Verificar campos en rojo</span>
+			</div>
+            <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute;bottom:1%;height:2000px;width:100%" ng-show="progressBar">
+                    <md-progress-circular md-mode="indeterminate" md-diameter="100" 
+                        style="position:fixed;bottom:50%"></md-progress-circular>
+            </div>
+                
+<!--
+            {{form.newUser.$invalid}}
+                
+-->
+
+				
+			</md-card-actions>
+		</form>
+		</md-card>
+		
+
+</div>

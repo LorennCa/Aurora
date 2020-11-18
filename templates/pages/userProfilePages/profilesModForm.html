@@ -1,0 +1,132 @@
+<div class="page-container" ng-controller="userProfileController">
+	<md-card flex>
+		 <div class="md-card-content">
+			<form name="formC.profileFormC" ng-init="cargaDatos()" ng-submit="formC.profileFormC.$valid && !exits && saveMod($event)" ng-cloak novalidate>
+	<div  layout-align="center center"  layout-gt-lg="row" >
+	    <md-card-content flex ng-hide="hideFields">
+	  	<div layout-gt-lg="column" flex  >	  
+			<md-input-container class="md-block" layout-gt-lg="row" >
+				<label>Nombre perfil</label>
+					<input id="nombreC" ng-model="formProfileC.nombreC"   name="nombreC"  maxlength="50" ng-disabled="fieldsDisabled" value="formProfileC.nombreC" ng-blur="validarNombre(formProfileC.nombreC ,'M')" ng-pattern="validaAlfaNumericoEsp" required/>
+					<!-- ng-blur="validarNombre(formProfileC.nombreC ,'M')" -->
+					<div class="error-wrapper" ng-if=" formC.profileFormC.nombreC.$invalid || exits">
+					<div ng-messages="formC.profileFormC.nombreC.$error" >
+							<div ng-message="required">{{requerido}}</div>
+							<div ng-message="pattern">{{invalidCh}}</div>
+					</div>	
+					<div ng-messages="formC.profileFormC.nombreC.$invalid" >
+						<span class="ng-messages" ng-show="exits" ng-hide="formC.profileFormC.nombreC.$error.required || formC.profileFormC.nombreC.$error.pattern">{{exitsPro}}</span>
+					</div>
+					</div>
+
+			</md-input-container>
+			<!-- perfil superior -->
+			<md-input-container class="md-block" layout-gt-lg="row" >
+				<label>Perfil Superior</label>				 
+					<md-select name="superiorProfileC" id="superiorProfileC"  ng-model="formProfileC.perfilSuperiorC" ng-disabled="fieldsDisabled" required>			
+						<md-option ng-value="item" ng-repeat="item in items" ng-hide="item.id == select[0].id">
+							{{item.nombre}}
+						</md-option>
+					</md-select> 													            
+				<div ng-messages="formC.profileFormC.superiorProfileC.$error" ng-if='formC.profileFormC.superiorProfileC.$invalid '>
+					<div ng-message="required">{{requerido}}</div>
+				</div>
+			</md-input-container>
+		</div>
+										
+	<!-- opciones de menu -->
+Seleccione los permisos del sistema:
+<div class="catalog" layout layout-wrap layout-align="center"  >
+		<div  ng-repeat="children in opcmenuC.children" flex="50" flex-md="50" flex-md="80" ng-class="{shaded:$mdMedia('xs') }" >
+		<ol  ng-model="formProfileC.menu" >
+			<div ng-show="!emptyData" ui-tree="options" data-drag-enabled="false">
+				<ol id="demoTree" ui-tree-nodes ng-model="formProfileC.parent">
+					<li  ui-tree-node collapsed="true" >
+						<div class="node-embed" ui-tree-handle ng-class="{nodeActive:children.isSelected,matched:children.match}"  style="color:#000;background: rgba(0, 0, 0, 0.18);margin:2px;">
+		    				<a class="btn btn-clear btn-xs" data-ng-show="children.children.length" ng-click="expandNode(this,$event)">
+		    					<md-icon class="md-primary md-icon-button" class="material-icons" ng-show="collapsed"  md-svg-icon="components/assets/svg/expand_more.svg" ></md-icon>
+		                        <md-icon class="md-primary md-icon-button" class="material-icons" ng-show="!collapsed" md-svg-icon="components/assets/svg/expand_less.svg" ></md-icon>
+		        			</a>
+							<span class="node-header">
+		        			<input id="children.id" type="checkbox" name="{{children.label}}" ng-checked="children.isSelected" indeterminate-checkbox node="children" ng-click="itemSelect(children,'M')" ng-disabled="fieldsDisabled"/>
+		 					</span>
+					    {{children.label}}
+						</div>
+
+						<ol ui-tree-nodes="options" ng-model="formProfileC.opciones" ng-class="{hidden: collapsed,displayed:!collapsed}">
+  							<li ng-repeat="opciones in children.children" ui-tree-node collapsed="true" >
+  								<div class="node-embed" ui-tree-handle ng-class="{nodeActive:opciones.isSelected,matched:opciones.match}"  style="color:#8f8f8f;">
+		    						<a class="btn btn-clear btn-xs" data-ng-show="children.children.length" ng-click="expandNode(this,$event)">
+				    					<md-icon class="md-primary md-icon-button" class="material-icons" ng-show="collapsed"  md-svg-icon="components/assets/svg/expand_more.svg" ></md-icon>
+				                        <md-icon class="md-primary md-icon-button" class="material-icons" ng-show="!collapsed" md-svg-icon="components/assets/svg/expand_less.svg" ></md-icon>
+				        			</a>
+									<span class="node-header">
+				        			<input id="opciones.id" type="checkbox" ng-checked="opciones.isSelected" indeterminate-checkbox node="opciones" ng-click="itemSelect(opciones,'M')" ng-disabled="fieldsDisabled"/>
+				 					</span>
+							    {{opciones.label}}
+								</div>
+
+								<ol ui-tree-nodes="options" ng-model="formProfileC.subitem" ng-class="{hidden: collapsed,displayed:!collapsed}">
+								  <li ng-repeat="subitem in opciones.children" ui-tree-node collapsed="true">
+								  	<div class="node-embed" ui-tree-handle ng-class="{nodeActive:subitem.isSelected,matched:subitem.match}"  style="color:#8f8f8f;">
+		    						<a class="btn btn-clear btn-xs" data-ng-show="subitem.length" ng-click="expandNode(this,$event)">
+				    					<md-icon class="md-primary md-icon-button" class="material-icons" ng-show="collapsed"  md-svg-icon="components/assets/svg/expand_more.svg" ></md-icon>
+				                        <md-icon class="md-primary md-icon-button" class="material-icons" ng-show="!collapsed" md-svg-icon="components/assets/svg/expand_less.svg" ></md-icon>
+				        			</a>
+									<span class="node-header">
+				        			<input id="subitem.id" type="checkbox" ng-checked="subitem.isSelected" indeterminate-checkbox node="subitem" ng-click="itemSelect(subitem,'M')" ng-disabled="fieldsDisabled"/>
+				 					</span>
+								    {{subitem.label}}
+									</div>
+								  </li>
+								</ol>	
+
+							</li>
+						</ol>
+					</li>
+				</ol>
+			</div>
+		</ol>
+		</div>
+</div>
+
+	<!-- fin opciones menu -->	
+	</md-card-content>
+		<md-card-actions>
+			<div layout="row" layout-align="end center">
+				<md-button ng-show="tabMod()" ng-click="modificar()" ng-disabled="opcHabMod" >
+					<md-tooltip>Modificar Perfil</md-tooltip>
+				        <md-icon class="material-icons" md-svg-icon="components/assets/svg/modify.svg"></md-icon>
+				</md-button>
+				
+				<md-button ng-show="tabDel()" ng-click="eliminar($event)" ng-disabled="opcHabDel" >
+					<md-tooltip>Eliminar Perfil</md-tooltip>
+				    <md-icon class="material-icons" md-svg-icon="components/assets/svg/remove.svg"></md-icon>                			
+				</md-button>	
+							
+				<md-button ng-show="tabRep()" ng-disabled="opcHabRep" ng-click="report($event)" >
+					<md-tooltip>Generar reporte Perfil</md-tooltip>
+				    <md-icon class="material-icons" md-svg-icon="components/assets/svg/archive.svg"></md-icon>
+				</md-button>
+				<md-button type="submit" ng-show="tabSav()" ng-click="submitted=true" ng-disabled="progressBar">
+					<md-tooltip>Guardar Perfil</md-tooltip>
+			        <md-icon class="material-icons" md-svg-icon="components/assets/svg/save_black.svg"></md-icon>
+				</md-button>	
+				<span class="ng-messages" style="color:red" ng-show='(submitted && (formC.profileFormC.$invalid || exits) )'>Verificar campos en rojo </span>							    	
+			
+			</div>
+		</md-card-actions>									    
+		
+	</div>
+</form> 
+     <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute;bottom:1%;height:2000px;width:100%" ng-show="progressBar">
+                <md-progress-circular md-mode="indeterminate" md-diameter="100" style="position:fixed;bottom:50%"></md-progress-circular>
+        </div>     			      	
+		 </div>
+
+		
+	</md-card>
+
+
+
+</div>

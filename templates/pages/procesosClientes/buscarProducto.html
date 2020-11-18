@@ -1,0 +1,63 @@
+<div ng-controller="ecommerceController" ng-init="productosDisp($event)">
+
+<link rel="stylesheet" href="components/css/estilos4.css">
+<!------ Include the above in your HEAD tag ---------->
+
+	<!--Please don't use class container for below programe. Because i designes it as it is.-->
+	<!--The body size is fixed which is just bigger then container.-->
+	<!--If you are using Container the make changes in css file (pro-box{width:100%;})-->
+	<!--for any help ping me on https://www.facebook.com/er.omnath or on https://www.instagram.com/er.omnath-->
+	<!--For More Visit https://www.youtube.com/engineerons -->
+    
+    
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="row justify-content-center">
+                        <div class="col-12 col-md-10 col-lg-8">
+                            <form class="card card-sm">
+                                <div class="card-body row no-gutters align-items-center">
+                                    <!--end of col-->
+                                    <div class="col">
+                                        <input class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search topics or keywords">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--end of col-->
+                    </div>
+    
+    
+    
+    
+    
+    
+    
+	<section class="pro-box"> <!--Remove mt-4 if u don't want space in above and remove mb-4 if u dont want space below-->
+		<div class="row product-grid p-4">
+			
+			<div class="border rounded product-card mb-5 p-2" style="width: 22rem;height:22rem;" ng-repeat="producto in listaInventario | filter: filter.search  | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+				<div class="pro-img" ng-click="detalles(producto)">
+					<a ng-href="">
+					  <img style="width:100%;height:9vw;object-fit: cover;" class="img-responsive rounded"  src="{{producto.recursoUno}}">
+					</a>
+				</div>
+				<div>
+					<div>
+					  <span style="font-size: 16px; color: green;" class="text-center">{{producto.clave.referencia}}</span>
+					</div>
+					<div>
+					  <label style="font-size: 14px;"><strong style="color: red; ">{{producto.clave.color}}</strong></label>
+					</div>
+					<div style="color: blue;">Price: <strong>{{producto.precio | currency: '$'}}</strong></div>
+                    <div style="color: green;">Envío gratis</div>
+				</div>
+                <!--<button class="btn btn-success" ng-click="agregarCarrito(producto, $event)"><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Agregar al carrito</button>-->
+			</div>
+			
+		</div>
+		<md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{listInventarioLen}}" md-page-select="limitOptions.pageSelect"  md-on-paginate="logPagination"></md-table-pagination>
+	</section>
+    </div>
